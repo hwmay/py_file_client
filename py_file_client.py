@@ -101,8 +101,8 @@ class MeinDialog(QtGui.QMainWindow, MainWindow):
 		# generic thread using signal
 		self.threadPool.append(GenericThread(self.getFiles))
 		# signal for updating protocol listwidget
-		self.disconnect( self, QtCore.SIGNAL("add(QString)"), self.add )
-		self.connect( self, QtCore.SIGNAL("add(QString)"), self.add )
+		self.disconnect( self, QtCore.SIGNAL("add(QString)"), self.add)
+		self.connect( self, QtCore.SIGNAL("add(QString)"), self.add)
 		self.threadPool[len(self.threadPool)-1].start()
 		
 	def getFiles(self):
@@ -119,8 +119,9 @@ class MeinDialog(QtGui.QMainWindow, MainWindow):
 				self.emit(QtCore.SIGNAL('add(QString)'), "-----------------------------------------------")
 		app.restoreOverrideCursor()
 		
-	def onDown(self, zeile, spalte):
-		directory = (QtGui.QTableWidgetItem.text(self.tableWidget.item(zeile, 1)))
+	def onDown(self, zeile, spalte, directory = None):
+		if not directory:
+			directory = (QtGui.QTableWidgetItem.text(self.tableWidget.item(zeile, 1)))
 		contact_server = FileClient(host = self.host, port = self.port)
 		res = contact_server.work("cd " + unicode(directory))
 		if res.startswith("Error:"):
@@ -203,6 +204,10 @@ class MeinDialog(QtGui.QMainWindow, MainWindow):
 			self.listWidget.addItem(text)
 		self.listWidget.scrollToBottom()
 		
+	def keyPressEvent(self, event):
+		if event.key() in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):
+			self.onDown(0, 0, directory = self.lineEditDirectory.text())
+		
 	def closeEvent(self, event):
 		settings = QtCore.QSettings()
 		settings.setValue("py_file_client/Size", QtCore.QVariant(self.size()))
@@ -236,7 +241,7 @@ app = QtGui.QApplication(sys.argv)
 app.setOrganizationName("py_file_client")
 app.setOrganizationDomain("py_file_client")
 locale = QtCore.QLocale.system().name()
-#locale = "en_EN"
+locale = "en_EN"
 appTranslator = QtCore.QTranslator()
 if appTranslator.load("py_file_client_" + locale, os.getcwd()):
 	app.installTranslator(appTranslator)
