@@ -16,4 +16,6 @@ With the graphical client you can navigate thru the server and download files to
 
 The client window is splitted in two halfs: on the left site you see the files and directories on the server, the right site shows a journal of your actions respectively error messages from the server.
 
-For navigation double click on a server directory for entering it. Press the up button for moving up one directory level. Mark the files for downloading and press the get files button.
+For navigation double click on a server directory for entering it. Press the up button for moving up one directory level. Alternatively the directory on the server can be entered manually. 
+
+For downloading mark the files and press the get files button.
