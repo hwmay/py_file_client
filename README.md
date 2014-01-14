@@ -19,3 +19,6 @@ The client window is splitted in two halfs: on the left site you see the files a
 For navigation double click on a server directory for entering it. Press the up button for moving up one directory level. Alternatively the directory on the server can be entered manually. 
 
 For downloading mark the files and press the get files button.
+
+
+py_file_client is available in english and german, the server only in english.
