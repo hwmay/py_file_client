@@ -241,7 +241,7 @@ app = QtGui.QApplication(sys.argv)
 app.setOrganizationName("py_file_client")
 app.setOrganizationDomain("py_file_client")
 locale = QtCore.QLocale.system().name()
-locale = "en_EN"
+#locale = "en_EN"
 appTranslator = QtCore.QTranslator()
 if appTranslator.load("py_file_client_" + locale, os.getcwd()):
 	app.installTranslator(appTranslator)
