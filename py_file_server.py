@@ -43,7 +43,7 @@ class MyClientHandler(SocketServer.BaseRequestHandler):
 					print "Sent:", self.gesendet
 					f.close()
 				else:
-					self.blk = "Error: file does not exist"
+					self.blk = "Error: not a file or does not exist"
 					self.send_data(self.blk)
 					print "Sent:", self.gesendet, self.blk
 				break
@@ -111,8 +111,11 @@ class MyClientHandler(SocketServer.BaseRequestHandler):
 				break
 		
 	def send_data(self, blk):
-		self.request.sendall(blk)
-		self.gesendet += len(blk)
+		try:
+			self.request.sendall(blk)
+			self.gesendet += len(blk)
+		except:
+			pass
 		
 	def shutdown(self):
 		server.shutdown()

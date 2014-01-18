@@ -103,28 +103,40 @@ class MeinDialog(QtGui.QMainWindow, MainWindow):
 		# signal for updating protocol listwidget
 		self.disconnect( self, QtCore.SIGNAL("add(QString)"), self.add)
 		self.connect( self, QtCore.SIGNAL("add(QString)"), self.add)
+		# signal for changing the cursor
+		self.disconnect(self, QtCore.SIGNAL("cursorWait"), self.cursorWait)
+		self.connect(self, QtCore.SIGNAL("cursorWait"), self.cursorWait)
+		# signal for changing the cursor
+		self.disconnect(self, QtCore.SIGNAL("cursorNormal"), self.cursorNormal)
+		self.connect(self, QtCore.SIGNAL("cursorNormal"), self.cursorNormal)
+		# start thread
 		self.threadPool[len(self.threadPool)-1].start()
 		
 	def getFiles(self):
-		app.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
 		items = self.tableWidget.selectedItems()
 		for i in items:
 			if i.column() == 1:
 				befehl = self.trUtf8("Getting ") + i.text() + " ..."
-				self.emit(QtCore.SIGNAL('add(QString)'), befehl)
+				self.emit(QtCore.SIGNAL("add(QString)"), befehl)
+				self.emit(QtCore.SIGNAL("cursorWait"))
 				contact_server = FileClient(host = self.host, port = self.port, verzeichnis = self.lineEditDirectoryClient.text(), datei = i.text())
 				res = contact_server.work("get " + unicode(i.text()))
 				if res:
-					self.emit(QtCore.SIGNAL('add(QString)'), res)
-				self.emit(QtCore.SIGNAL('add(QString)'), "-----------------------------------------------")
-		app.restoreOverrideCursor()
+					self.emit(QtCore.SIGNAL("add(QString)"), res)
+				else:
+					self.emit(QtCore.SIGNAL("add(QString)"), self.trUtf8("Maybe server is not running?"))
+				self.emit(QtCore.SIGNAL("add(QString)"), "-----------------------------------------------")
+				self.emit(QtCore.SIGNAL("cursorNormal"))
 		
 	def onDown(self, zeile, spalte, directory = None):
 		if not directory:
 			directory = (QtGui.QTableWidgetItem.text(self.tableWidget.item(zeile, 1)))
 		contact_server = FileClient(host = self.host, port = self.port)
 		res = contact_server.work("cd " + unicode(directory))
-		if res.startswith("Error:"):
+		if not res:
+			self.listWidget.addItem(self.trUtf8("Maybe server is not running?"))
+			self.listWidget.scrollToBottom()
+		elif res.startswith("Error:"):
 			newitem = QtGui.QListWidgetItem(res.decode("utf-8"))
 			newitem.setTextColor(QtGui.QColor("red"))
 			self.listWidget.addItem(newitem)
@@ -203,6 +215,12 @@ class MeinDialog(QtGui.QMainWindow, MainWindow):
 		else:
 			self.listWidget.addItem(text)
 		self.listWidget.scrollToBottom()
+		
+	def cursorWait(self):
+		app.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+		
+	def cursorNormal(self):
+		app.restoreOverrideCursor()
 		
 	def keyPressEvent(self, event):
 		if event.key() in (QtCore.Qt.Key_Enter, QtCore.Qt.Key_Return):

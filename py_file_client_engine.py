@@ -49,12 +49,16 @@ class FileClient():
 			if dateiname:
 				if __name__ == "__main__":
 					print "Getting", dateiname
-					f = file(self.verzeichnis + os.sep + os.path.basename(dateiname), "wb")
+					dateiname_komplett = self.verzeichnis + os.sep + os.path.basename(dateiname)
 				else:
-					f = file(self.verzeichnis + os.sep + self.datei, "wb")
+					dateiname_komplett = self.verzeichnis + os.sep + self.datei
 				bytes = 0
+				datei_anlegen = True
 				while True:
 					data = self.sockobj.recv(self.blksize)
+					if data.startswith("Error:"):
+						self.ausgabe = data
+						break
 					bytes += len(data)
 					if not data:
 						if __name__ == "__main__":
@@ -62,6 +66,12 @@ class FileClient():
 						f.close()
 						self.ausgabe = str(bytes) + " bytes"
 						break
+					if datei_anlegen:
+						datei_anlegen = False
+						if os.path.exists(dateiname_komplett):
+							self.ausgabe = "Error: filename already exists"
+							break
+						f = file(dateiname_komplett, "wb")
 					f.write(data)
 			else:
 				print "Please enter a file name after get"
