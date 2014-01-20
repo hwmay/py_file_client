@@ -186,6 +186,7 @@ class MeinDialog(QtGui.QMainWindow, MainWindow):
 		zeile = []
 		for i in self.filelist:
 			zeile = i.strip().split(",")
+			eintrag = ""
 			for j in zeile:
 				if column == 0:
 					if j == "D":
@@ -194,10 +195,21 @@ class MeinDialog(QtGui.QMainWindow, MainWindow):
 					else:
 						newitem = QtGui.QTableWidgetItem()
 						newitem.setIcon(QtGui.QIcon("./Icons" + os.sep + "file-zoom-in.png"))
-				else:
-					newitem = QtGui.QTableWidgetItem(j.decode("utf-8"))
-				self.tableWidget.setItem(row, column, newitem)
-				column += 1
+					self.tableWidget.setItem(row, column, newitem)
+					column += 1
+				else:	#Special if the is a comma in filename
+					try:
+						laenge = int(j)
+						newitem = QtGui.QTableWidgetItem(eintrag.decode("utf-8"))
+						self.tableWidget.setItem(row, column, newitem)
+						column += 1
+						newitem = QtGui.QTableWidgetItem(j.decode("utf-8"))
+						self.tableWidget.setItem(row, column, newitem)
+					except:
+						if eintrag == "":
+							eintrag += j
+						else:
+							eintrag += "," + j
 			column = 0
 			row += 1
 		self.tableWidget.resizeColumnsToContents()
